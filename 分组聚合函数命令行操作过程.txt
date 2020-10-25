@@ -1,0 +1,31 @@
+>>>def showsql():
+...     from django.db import connection
+...     print(connection.queries[-1]['sql'])
+...     
+>>>from django.db.models import *
+>>>from stu.models import *
+>>>Student.objects.annotate(c=Count('score'))
+<QuerySet [<Student: Student object (1)>, <Student: Student object (2)>, <Student: Student object (3)>, <Student: Student object (4)>]>
+>>>showsql()
+SELECT "stu_student"."id", "stu_student"."sname", "stu_student"."score", "stu_student"."cls_id", COUNT("stu_student"."score") AS "c" FROM "stu_student" GROUP BY "stu_student"."id", "stu_student"."sname", "stu_student"."score", "stu_student"."cls_id" LIMIT 21
+>>>Student.objects.values('cls').annotate(c=Count('score'))
+<QuerySet [{'cls': 1, 'c': 1}, {'cls': 2, 'c': 1}, {'cls': 3, 'c': 1}, {'cls': 4, 'c': 1}]>
+>>>showsql()
+SELECT "stu_student"."cls_id", COUNT("stu_student"."score") AS "c" FROM "stu_student" GROUP BY "stu_student"."cls_id" LIMIT 21
+>>>Student.objects.values('cls').annotate(a=Avg('score'))
+<QuerySet [{'cls': 1, 'a': 88.0}, {'cls': 2, 'a': 99.0}, {'cls': 3, 'a': 66.0}, {'cls': 4, 'a': 77.0}]
+>>>showsql()
+SELECT "stu_student"."cls_id", AVG("stu_student"."score") AS "a" FROM "stu_student" GROUP BY "stu_student"."cls_id" LIMIT 21
+>>>Student.objects.values('cls').annotate(s=Sum('score')).aggregate(m=Max('s'))
+{'m': 99}
+>>>showsql()
+SELECT MAX("s") FROM (SELECT "stu_student"."cls_id" AS Col1, SUM("stu_student"."score") AS "s" FROM "stu_student" GROUP BY "stu_student"."cls_id") subquery
+>>>Student.objects.values('cls__cname')
+<QuerySet [{'cls__cname': 'B201Python班'}, {'cls__cname': 'B202Python班'}, {'cls__cname': 'B203Python班'}, {'cls__cname': 'B204Python班'}]>
+>>>showsql()
+SELECT "stu_clazz"."cname" FROM "stu_student" INNER JOIN "stu_clazz" ON ("stu_student"."cls_id" = "stu_clazz"."id") LIMIT 21
+>>>Student.objects.values('cls__id')
+<QuerySet [{'cls__id': 1}, {'cls__id': 2}, {'cls__id': 3}, {'cls__id': 4}]>
+>>>showsql()
+SELECT "stu_student"."cls_id" FROM "stu_student" LIMIT 21
+注：values和annotate合在一起使用时，values的作用相当于group by。values单独使用时，相当于部分查询
