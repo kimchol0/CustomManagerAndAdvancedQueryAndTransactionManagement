@@ -1,0 +1,72 @@
+>>>from stu.models import *
+>>>stus = Student.objects.raw('select * from stu_student')
+>>>print(stus)
+<RawQuerySet: select * from stu_student>
+>>>for s in stus:
+...     print(s)
+... 
+Student:zhangsan,88
+Student:lisi,99
+Student:wangwu,66
+Student:zhaoliu,77
+
+重启
+
+>>>from stu.models import *
+>>>from django.db import connection
+>>>cur = connection.cursor()
+>>>cur.execute('select * from stu_student')
+<django.db.backends.sqlite3.base.SQLiteCursorWrapper object at 0x000001C56130C0D0>
+>>>cs = cur.fetchall()
+>>>print(cs)
+[(1, 'zhangsan', 88, 1), (2, 'lisi', 99, 2), (3, 'wangwu', 66, 3), (4, 'zhaoliu', 77, 4)]
+>>>for c in cs:
+...     print(c)
+...     
+(1, 'zhangsan', 88, 1)
+(2, 'lisi', 99, 2)
+(3, 'wangwu', 66, 3)
+(4, 'zhaoliu', 77, 4)
+>>>cur.close()
+
+重启
+
+>>>from stu.models import *
+>>>from django.db import connection
+>>>cur = connection.cursor()
+>>>cur.execute('select sname,score from stu_student')
+<django.db.backends.sqlite3.base.SQLiteCursorWrapper object at 0x0000023DAA6340D0>
+>>>cs = cur.fetchall()
+>>>print(cs)
+[('zhangsan', 88), ('lisi', 99), ('wangwu', 66), ('zhaoliu', 77)]
+>>>for c in cs:
+...     print(c)
+...     
+('zhangsan', 88)
+('lisi', 99)
+('wangwu', 66)
+('zhaoliu', 77)
+
+重启
+
+>>>from stu.models import *
+>>>from django.db import connection
+>>>cur = connection.cursor()
+>>>cur.execute('select * from stu_clazz where id=1')
+<django.db.backends.sqlite3.base.SQLiteCursorWrapper object at 0x000002A96C3D6B80>
+>>>cur.fetchone()
+(1, 'B201Python班')
+>>>cur.close()
+>>>def test(sql):
+...     from django.db import connection
+...     with connection.cursor() as c:
+...         c.execute(sql)
+...         for info in c.fetchall():
+...             print(info)
+...             
+>>>test('select * from stu_clazz')
+(1, 'B201Python班')
+(2, 'B202Python班')
+(3, 'B203Python班')
+(4, 'B204Python班')
+注：有with语句会自动关闭，不需要执行cur.close()了

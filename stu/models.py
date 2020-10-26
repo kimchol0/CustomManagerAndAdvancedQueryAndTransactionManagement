@@ -11,6 +11,9 @@ class Student(models.Model):
     score = models.PositiveIntegerField()
     cls = models.ForeignKey(Clazz, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return u'Student:%s,%s' % (self.sname, self.score)
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         try:
