@@ -1,0 +1,22 @@
+>>>from stu.models import *
+>>>from django.db.models import Q,F
+>>>Student.objects.filter(Q(sname='lisi')&Q(score=99))
+<QuerySet [<Student: Student:lisi,99>]>
+>>>def showsql():
+...     from django.db import connection
+...     print(connection.queries[-1]['sql'])
+...     
+>>>showsql()
+SELECT "stu_student"."id", "stu_student"."sname", "stu_student"."score", "stu_student"."cls_id" FROM "stu_student" WHERE ("stu_student"."sname" = 'lisi' AND "stu_student"."score" = 99) LIMIT 21
+>>>Student.objects.filter(Q(sname='lisi')|Q(score=99))
+<QuerySet [<Student: Student:lisi,99>]>
+>>>showsql()
+SELECT "stu_student"."id", "stu_student"."sname", "stu_student"."score", "stu_student"."cls_id" FROM "stu_student" WHERE ("stu_student"."sname" = 'lisi' OR "stu_student"."score" = 99) LIMIT 21
+>>>Student.objects.filter(~Q(sname='wangwu'))
+<QuerySet [<Student: Student:zhangsan,88>, <Student: Student:lisi,99>, <Student: Student:zhaoliu,77>]>
+>>>showsql()
+SELECT "stu_student"."id", "stu_student"."sname", "stu_student"."score", "stu_student"."cls_id" FROM "stu_student" WHERE NOT ("stu_student"."sname" = 'wangwu') LIMIT 21
+>>>Student.objects.filter(id=3).update(score=F('score')+10)
+1
+>>>showsql()
+UPDATE "stu_student" SET "score" = ("stu_student"."score" + 10) WHERE "stu_student"."id" = 3
